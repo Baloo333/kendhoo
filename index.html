@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  Kendhoo.com  —  Dhivehi News Portal (single-file demo)
+  ----------------------------------------------------------------------------
+  • Language: Dhivehi (Thaana script)  •  Direction: RTL
+  • Font:  Noto Sans Thaana (Google Fonts) — proper Thaana rendering
+  • Features: dark mode toggle, dropdown nav (desktop hover + mobile tap),
+    hero + latest strip, category blocks, ad slots, photo gallery, archive.
+  • Images: picsum.photos placeholders (swap with your real media).
+  • All CSS + JS are embedded below so this file runs on its own.
+  ============================================================================
+-->
+<html lang="dv" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ކެންދޫ.ކޮމް — ދިވެހި ޚަބަރު</title>
+  <meta name="description" content="ކެންދޫ.ކޮމް — ރާއްޖެއާއި ދުނިޔޭގެ އެންމެ ފަހުގެ ޚަބަރު" />
+
+  <!-- Thaana + Latin webfonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@100..900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ======================================================================
+       1. DESIGN TOKENS
+       ====================================================================== */
+    :root {
+      --red:        #C8102E;   /* primary accent (masthead / tags / links) */
+      --red-dark:   #a10c24;
+      --ink:        #15181f;   /* near-black nav bar */
+      --ink-2:      #1f232c;
+
+      --bg:         #ffffff;   /* page background */
+      --soft:       #f4f5f7;   /* soft section background */
+      --surface:    #ffffff;   /* cards */
+      --text:       #171a1f;   /* body text */
+      --muted:      #6b7280;   /* secondary text / dates */
+      --line:       #e7e8ec;   /* hairlines & borders */
+
+      --radius:     8px;
+      --shadow:     0 1px 2px rgba(20,24,31,.06), 0 6px 22px rgba(20,24,31,.05);
+      --maxw:       1240px;
+
+      --f-body: 'Noto Sans Thaana', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --f-latin: 'Inter', system-ui, sans-serif;
+    }
+
+    /* Dark theme overrides (toggled on <html data-theme="dark">) */
+    :root[data-theme="dark"] {
+      --bg:      #12141a;
+      --soft:    #191c23;
+      --surface: #1b1f27;
+      --text:    #e9eaee;
+      --muted:   #9aa1ac;
+      --line:    #2a2f39;
+      --ink:     #0e1015;
+      --ink-2:   #171a21;
+      --shadow:  0 1px 2px rgba(0,0,0,.4), 0 8px 26px rgba(0,0,0,.35);
+    }
+
+    /* ======================================================================
+       2. RESET & BASE
+       ====================================================================== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--f-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 16px;
+      transition: background .25s ease, color .25s ease;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; height: auto; }
+    ul { list-style: none; }
+
+    .wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: 18px; }
+
+    /* Latin bits (logo suffix, ad labels, dates numerals stay legible) */
+    .latin { font-family: var(--f-latin); }
+
+    /* Focus visibility for keyboard users */
+    a:focus-visible, button:focus-visible {
+      outline: 3px solid var(--red);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* ======================================================================
+       3. TOP UTILITY BAR
+       ====================================================================== */
+    .topbar {
+      background: var(--ink);
+      color: #cfd3da;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .topbar .wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      min-height: 40px; gap: 14px;
+    }
+    .topbar__date { display: flex; align-items: center; gap: 8px; }
+    .topbar__date .dot { color: var(--red); font-size: 18px; line-height: 0; }
+    .topbar__social { display: flex; align-items: center; gap: 4px; }
+    .topbar__social a {
+      width: 30px; height: 30px; display: grid; place-items: center;
+      border-radius: 6px; color: #cfd3da; transition: .18s;
+    }
+    .topbar__social a:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    /* ======================================================================
+       4. MASTHEAD (logo right, tools left — RTL)
+       ====================================================================== */
+    .masthead { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .masthead .wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 18px; padding-block: 18px;
+    }
+
+    .brand { display: flex; align-items: baseline; gap: 10px; }
+    .brand__mark {
+      font-weight: 900; font-size: clamp(30px, 5vw, 46px); letter-spacing: -.5px;
+      color: var(--text); line-height: 1;
+    }
+    .brand__mark .accent { color: var(--red); }
+    .brand__tld { font-family: var(--f-latin); font-weight: 800; color: var(--muted); font-size: 15px; }
+    .brand__tag {
+      font-size: 13px; color: var(--muted);
+      border-inline-start: 3px solid var(--red); padding-inline-start: 10px; margin-inline-start: 4px;
+    }
+
+    .tools { display: flex; align-items: center; gap: 10px; }
+    .icon-btn {
+      width: 42px; height: 42px; border: 1px solid var(--line); background: var(--bg);
+      color: var(--text); border-radius: 999px; display: grid; place-items: center;
+      cursor: pointer; transition: .18s;
+    }
+    .icon-btn:hover { border-color: var(--red); color: var(--red); }
+    .icon-btn svg { width: 20px; height: 20px; }
+    /* show correct icon per theme */
+    .icon-btn .i-moon { display: block; }
+    .icon-btn .i-sun  { display: none; }
+    :root[data-theme="dark"] .icon-btn .i-moon { display: none; }
+    :root[data-theme="dark"] .icon-btn .i-sun  { display: block; }
+
+    /* ======================================================================
+       5. NAVIGATION
+       ====================================================================== */
+    .nav { background: var(--ink); position: sticky; top: 0; z-index: 60; }
+    .nav .wrap { display: flex; align-items: center; gap: 8px; }
+
+    .nav__toggle {
+      display: none; background: none; border: 0; color: #fff; cursor: pointer;
+      padding: 12px 6px; font-size: 22px;
+    }
+
+    .menu { display: flex; align-items: stretch; }
+    .menu > li { position: relative; }
+    .menu > li > a {
+      display: flex; align-items: center; gap: 6px;
+      color: #e7e9ee; font-weight: 600; font-size: 15.5px;
+      padding: 14px 15px; white-space: nowrap; transition: .18s; position: relative;
+    }
+    .menu > li > a::after {
+      content: ""; position: absolute; inset-inline: 12px; bottom: 0; height: 3px;
+      background: var(--red); transform: scaleX(0); transition: transform .2s;
+    }
+    .menu > li > a:hover { color: #fff; }
+    .menu > li > a:hover::after { transform: scaleX(1); }
+    .menu > li.active > a { color: #fff; }
+    .menu > li.active > a::after { transform: scaleX(1); }
+
+    .caret { font-size: 11px; opacity: .8; }
+
+    /* Dropdown panel */
+    .dropdown {
+      position: absolute; top: 100%; inset-inline-end: 0; min-width: 210px;
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 0 0 var(--radius) var(--radius); box-shadow: var(--shadow);
+      padding: 6px; opacity: 0; visibility: hidden; transform: translateY(8px);
+      transition: .18s; z-index: 70;
+    }
+    .dropdown li a {
+      display: block; padding: 10px 12px; border-radius: 6px;
+      color: var(--text); font-size: 15px;
+    }
+    .dropdown li a:hover { background: var(--soft); color: var(--red); }
+
+    /* desktop hover reveal */
+    @media (hover:hover) and (min-width: 993px) {
+      .has-dropdown:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    }
+    /* mobile/tap reveal via .open */
+    .has-dropdown.open .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+
+    /* ======================================================================
+       6. AD SLOTS
+       ====================================================================== */
+    .ad {
+      display: grid; place-items: center; background: var(--soft);
+      border: 1px dashed color-mix(in srgb, var(--muted) 45%, transparent);
+      color: var(--muted); border-radius: var(--radius); text-align: center;
+    }
+    .ad small { font-family: var(--f-latin); letter-spacing: .5px; font-size: 12px; }
+    .ad .adtag { display:block; font-size: 11px; opacity: .7; margin-bottom: 2px; }
+    .ad--leader { height: 100px; margin-block: 22px; }
+    .ad--incontent { height: 120px; margin-block: 26px; }
+    .ad--rect { height: 600px; }
+
+    /* ======================================================================
+       7. SHARED PIECES (tag, meta, section head, card)
+       ====================================================================== */
+    .tag {
+      display: inline-block; background: var(--red); color: #fff;
+      font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 4px;
+    }
+    .tag--soft { background: color-mix(in srgb, var(--red) 12%, transparent); color: var(--red); }
+
+    .meta { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+    .meta .sep { opacity: .5; }
+
+    .sec-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px; padding-bottom: 10px; border-bottom: 2px solid var(--line);
+    }
+    .sec-head h2 {
+      font-size: 22px; font-weight: 800; position: relative; padding-inline-start: 14px;
+    }
+    .sec-head h2::before {
+      content: ""; position: absolute; inset-inline-start: 0; top: 4px; bottom: 4px;
+      width: 5px; background: var(--red); border-radius: 3px;
+    }
+    .sec-head .more { color: var(--red); font-size: 14px; font-weight: 600; }
+    .sec-head .more:hover { text-decoration: underline; }
+
+    .card { background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+    .card__thumb { position: relative; overflow: hidden; aspect-ratio: 16/10; }
+    .card__thumb img { height: 100%; object-fit: cover; transition: transform .4s ease; }
+    .card:hover .card__thumb img { transform: scale(1.05); }
+    .card__thumb .tag { position: absolute; top: 10px; inset-inline-end: 10px; }
+    .card__body { padding: 12px 4px; }
+    .card__title {
+      font-size: 16.5px; font-weight: 700; line-height: 1.7; margin-bottom: 8px;
+      transition: color .18s;
+    }
+    .card:hover .card__title { color: var(--red); }
+
+    section { margin-block: 40px; }
+
+    /* ======================================================================
+       8. HERO + LATEST STRIP
+       ====================================================================== */
+    .lead-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 26px; margin-top: 26px;
+    }
+
+    /* Featured story */
+    .hero { position: relative; border-radius: var(--radius); overflow: hidden; }
+    .hero__thumb { aspect-ratio: 16/9; }
+    .hero__thumb img { height: 100%; object-fit: cover; }
+    .hero__overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.35) 45%, transparent 75%);
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 28px;
+    }
+    .hero__title {
+      color: #fff; font-size: clamp(24px, 3.4vw, 36px); font-weight: 800;
+      line-height: 1.55; margin: 12px 0 10px;
+    }
+    .hero__excerpt { color: #e9e9ec; font-size: 15.5px; max-width: 60ch; margin-bottom: 12px; }
+    .hero__overlay .meta { color: #cfd2d8; }
+
+    /* Latest news list (އެންމެފަސް) */
+    .latest { background: var(--soft); border-radius: var(--radius); padding: 16px 18px; }
+    .latest__head {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+      font-size: 18px; font-weight: 800;
+    }
+    .latest__head .pulse {
+      width: 9px; height: 9px; border-radius: 50%; background: var(--red);
+      box-shadow: 0 0 0 0 rgba(200,16,46,.6); animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
+    .latest__list li {
+      padding: 13px 0; border-bottom: 1px solid var(--line);
+      display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+    }
+    .latest__list li:last-child { border-bottom: 0; }
+    .latest__time {
+      font-family: var(--f-latin); font-size: 12px; font-weight: 700; color: var(--red);
+      background: color-mix(in srgb, var(--red) 12%, transparent);
+      padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+    }
+    .latest__link { font-size: 15px; font-weight: 600; line-height: 1.65; transition: color .18s; }
+    .latest__link:hover { color: var(--red); }
+    .latest__link .cat { color: var(--muted); font-size: 12px; font-weight: 700; margin-bottom: 2px; display: block; }
+
+    /* ======================================================================
+       9. CATEGORY BLOCKS
+       ====================================================================== */
+    .cards-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+
+    /* content + sidebar layout for the middle of the page */
+    .content-grid { display: grid; grid-template-columns: 1fr 300px; gap: 30px; align-items: start; }
+    .sidebar { position: sticky; top: 76px; display: grid; gap: 26px; }
+    .sidebar .widget { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+    .sidebar .widget__head {
+      padding: 12px 16px; font-weight: 800; font-size: 16px;
+      border-bottom: 2px solid var(--red);
+    }
+    .rank-list li {
+      display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center;
+      padding: 12px 16px; border-bottom: 1px solid var(--line);
+    }
+    .rank-list li:last-child { border-bottom: 0; }
+    .rank-list .num {
+      font-family: var(--f-latin); font-weight: 800; font-size: 20px;
+      color: var(--red); width: 30px; text-align: center;
+    }
+    .rank-list a { font-size: 14.5px; font-weight: 600; line-height: 1.6; }
+    .rank-list a:hover { color: var(--red); }
+
+    /* ======================================================================
+       10. PHOTO GALLERY STRIP
+       ====================================================================== */
+    .gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .gtile { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4/3; }
+    .gtile img { height: 100%; object-fit: cover; transition: transform .4s; }
+    .gtile:hover img { transform: scale(1.06); }
+    .gtile__cap {
+      position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 14px;
+      background: linear-gradient(to top, rgba(0,0,0,.8), transparent 60%);
+      color: #fff; font-weight: 700; font-size: 15px;
+    }
+    .gtile__icon {
+      position: absolute; top: 10px; inset-inline-start: 10px;
+      background: rgba(0,0,0,.55); color: #fff; border-radius: 6px;
+      padding: 3px 8px; font-size: 12px; display: flex; gap: 5px; align-items: center;
+    }
+
+    /* ======================================================================
+       11. ON THIS DAY / ARCHIVE
+       ====================================================================== */
+    .archive { background: var(--soft); border-radius: var(--radius); padding: 26px; }
+    .archive__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .yearcol { background: var(--surface); border-radius: var(--radius); padding: 18px; border: 1px solid var(--line); }
+    .yearcol__badge {
+      font-family: var(--f-latin); font-weight: 800; font-size: 30px; color: var(--red);
+      line-height: 1; margin-bottom: 4px;
+    }
+    .yearcol__label { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+    .yearcol li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 14.5px; line-height: 1.6; }
+    .yearcol li:hover { color: var(--red); }
+
+    /* ======================================================================
+       12. FOOTER
+       ====================================================================== */
+    .footer { background: var(--ink); color: #c7cbd3; margin-top: 50px; }
+    .footer__top {
+      display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 30px;
+      padding-block: 42px; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .footer__brand .brand__mark { color: #fff; font-size: 30px; }
+    .footer__brand p { color: #9aa1ac; font-size: 14px; margin-top: 12px; max-width: 34ch; }
+    .footer__col h4 { color: #fff; font-size: 15px; margin-bottom: 14px; }
+    .footer__col li { margin-bottom: 9px; }
+    .footer__col a { color: #b6bcc6; font-size: 14px; transition: .18s; }
+    .footer__col a:hover { color: var(--red); }
+    .footer__social { display: flex; gap: 8px; margin-top: 16px; }
+    .footer__social a {
+      width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center;
+      background: rgba(255,255,255,.08); color: #cfd3da; transition: .18s;
+    }
+    .footer__social a:hover { background: var(--red); color: #fff; }
+    .footer__bottom { padding-block: 18px; text-align: center; font-size: 13px; color: #8b929c; }
+    .footer__bottom .latin { letter-spacing: .3px; }
+
+    /* ======================================================================
+       13. RESPONSIVE
+       ====================================================================== */
+    @media (max-width: 992px) {
+      .lead-grid, .content-grid { grid-template-columns: 1fr; }
+      .cards-4 { grid-template-columns: repeat(2, 1fr); }
+      .gallery { grid-template-columns: repeat(2, 1fr); }
+      .archive__grid { grid-template-columns: 1fr; }
+      .footer__top { grid-template-columns: 1fr 1fr; }
+      .sidebar { position: static; }
+
+      /* Mobile nav */
+      .nav .wrap { flex-wrap: wrap; }
+      .nav__toggle { display: block; margin-inline-start: auto; }
+      .menu {
+        flex-direction: column; align-items: stretch; width: 100%;
+        max-height: 0; overflow: hidden; transition: max-height .3s ease;
+      }
+      .menu.show { max-height: 720px; overflow: visible; padding-bottom: 8px; }
+      .menu > li > a { padding: 13px 6px; border-top: 1px solid rgba(255,255,255,.07); }
+      .menu > li > a::after { display: none; }
+      .dropdown {
+        position: static; opacity: 1; visibility: visible; transform: none;
+        display: none; box-shadow: none; border: 0; background: rgba(255,255,255,.04);
+        border-radius: 6px; margin: 0 6px 8px;
+      }
+      .has-dropdown.open .dropdown { display: block; }
+      .dropdown li a { color: #d4d8df; }
+      .dropdown li a:hover { background: rgba(255,255,255,.08); color: #fff; }
+    }
+
+    @media (max-width: 560px) {
+      .cards-4, .gallery { grid-template-columns: 1fr; }
+      .footer__top { grid-template-columns: 1fr; }
+      .brand__tag { display: none; }
+      .hero__overlay { padding: 18px; }
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ====================== TOP UTILITY BAR ====================== -->
+  <div class="topbar">
+    <div class="wrap">
+      <div class="topbar__date">
+        <span class="dot">●</span>
+        <span id="today">ހޯމަ، 4 އޯގަސްޓް 2026</span>
+      </div>
+      <div class="topbar__social" aria-label="ސޯޝަލް މީޑިއާ">
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M13 22v-8h2.7l.4-3H13V9c0-.9.3-1.5 1.6-1.5H16V4.8C15.6 4.7 14.6 4.6 13.5 4.6 11.2 4.6 9.7 6 9.7 8.6V11H7v3h2.7v8H13z"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17.5 3H21l-7.3 8.3L22 21h-6.4l-5-6.1L4.8 21H1.3l7.8-8.9L2 3h6.6l4.5 5.6L17.5 3zm-1.1 16h1.9L7.7 4.9H5.6L16.4 19z"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm0-4c-2 0-2.3 0-3.1.05-.8.04-1.4.16-1.9.35a3.8 3.8 0 00-1.4.9c-.4.4-.7.8-.9 1.4-.2.5-.3 1.1-.35 1.9C4.3 9.7 4.3 10 4.3 12s0 2.3.05 3.1c.04.8.16 1.4.35 1.9.2.6.5 1 .9 1.4.4.4.8.7 1.4.9.5.2 1.1.3 1.9.35.8.05 1.1.05 3.1.05s2.3 0 3.1-.05c.8-.04 1.4-.16 1.9-.35a3.8 3.8 0 001.4-.9c.4-.4.7-.8.9-1.4.2-.5.3-1.1.35-1.9.05-.8.05-1.1.05-3.1s0-2.3-.05-3.1c-.04-.8-.16-1.4-.35-1.9a3.8 3.8 0 00-.9-1.4c-.4-.4-.8-.7-1.4-.9-.5-.2-1.1-.3-1.9-.35C14.3 4.5 14 4.5 12 4.5zm0 1.6c2 0 2.2 0 3 .05.7.03 1.1.15 1.4.25.35.13.6.3.85.55.25.25.42.5.55.85.1.3.22.7.25 1.4.05.8.05 1 .05 3s0 2.2-.05 3c-.03.7-.15 1.1-.25 1.4a2.3 2.3 0 01-.55.85c-.25.25-.5.42-.85.55-.3.1-.7.22-1.4.25-.8.05-1 .05-3 .05s-2.2 0-3-.05c-.7-.03-1.1-.15-1.4-.25a2.3 2.3 0 01-.85-.55 2.3 2.3 0 01-.55-.85c-.1-.3-.22-.7-.25-1.4-.05-.8-.05-1-.05-3s0-2.2.05-3c.03-.7.15-1.1.25-1.4.13-.35.3-.6.55-.85.25-.25.5-.42.85-.55.3-.1.7-.22 1.4-.25.8-.05 1-.05 3-.05z"/></svg></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== MASTHEAD ====================== -->
+  <header class="masthead">
+    <div class="wrap">
+      <!-- Logo (right side in RTL) -->
+      <a class="brand" href="#" aria-label="ކެންދޫ.ކޮމް">
+        <span class="brand__mark">ކެން<span class="accent">ދޫ</span><span class="brand__tld">.com</span></span>
+        <span class="brand__tag">ބ. ކެންދޫގެ ޚަބަރު</span>
+      </a>
+
+      <!-- Tools (left side): search + dark mode toggle -->
+      <div class="tools">
+        <button class="icon-btn" id="searchBtn" aria-label="ހޯދާ">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+        <!-- Dark mode toggle -->
+        <button class="icon-btn" id="themeToggle" aria-label="ޑާކް މޯޑް" title="ޑާކް މޯޑް">
+          <svg class="i-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+          <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================== NAVIGATION ====================== -->
+  <nav class="nav" aria-label="މައި މެނޫ">
+    <div class="wrap">
+      <button class="nav__toggle" id="navToggle" aria-label="މެނޫ" aria-expanded="false">☰</button>
+
+      <ul class="menu" id="menu">
+        <li class="active"><a href="#">ފުރަތަމަ ޞަފްޙާ</a></li>
+        <li><a href="#">ރާއްޖެ</a></li>
+
+        <!-- Tourism with dropdown -->
+        <li class="has-dropdown">
+          <a href="#">ފަތުރުވެރިކަން <span class="caret">▾</span></a>
+          <ul class="dropdown">
+            <li><a href="#">ލޯކަލް ޓޫރިޒަމް</a></li>
+            <li><a href="#">ގެސްޓްހައުސް</a></li>
+            <li><a href="#">ރިސޯޓު</a></li>
+          </ul>
+        </li>
+
+        <li><a href="#">ކުޅިވަރު</a></li>
+        <li><a href="#">ވިޔަފާރި</a></li>
+        <li><a href="#">ދުނިޔެ</a></li>
+        <li><a href="#">މުނިފޫހިފިލުވުން</a></li>
+        <li><a href="#">ރިޕޯޓް</a></li>
+        <li><a href="#">ފޮޓޯ ގެލެރީ</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ====================== MAIN ====================== -->
+  <main class="wrap">
+
+    <!-- Top leaderboard ad -->
+    <div class="ad ad--leader" role="complementary">
+      <div><span class="adtag latin">ADVERTISEMENT</span><small>728 × 90 — Leaderboard</small></div>
+    </div>
+
+    <!-- ---------- HERO + LATEST STRIP ---------- -->
+    <section class="lead-grid" aria-label="ފީޗަރޑް ޚަބަރު">
+      <!-- Featured -->
+      <article class="hero">
+        <div class="hero__thumb">
+          <img src="https://picsum.photos/seed/kendhoo-harbour/1200/675" alt="ކެންދޫ ބަނދަރު" loading="eager" />
+        </div>
+        <div class="hero__overlay">
+          <span class="tag">ރާއްޖެ</span>
+          <h1 class="hero__title">ކެންދޫ ބަނދަރު ތަރައްޤީ ކުރުމުގެ މަޝްރޫޢު އަންނަ މަހު ފެށޭނެ ކަމަށް ކައުންސިލުން ބުނެފި</h1>
+          <p class="hero__excerpt">ދެ އަހަރު ދުވަހަށް ދިގުދެމިގެންދާ މި މަޝްރޫޢުގެ ދަށުން ބަނދަރު ބޮޑުކޮށް، އައު ޖެޓީއަކާއި ބޭރުތޮށި ލުމުގެ މަސައްކަތް ކުރެވޭނެ.</p>
+          <div class="meta"><span>4 އޯގަސްޓް 2026</span><span class="sep">•</span><span>3 މިނެޓް ކިޔުމަށް</span></div>
+        </div>
+      </article>
+
+      <!-- Latest news (އެންމެފަސް) -->
+      <aside class="latest" aria-label="އެންމެފަސް ޚަބަރު">
+        <div class="latest__head"><span class="pulse"></span> އެންމެފަސް</div>
+        <ul class="latest__list">
+          <li>
+            <span class="latest__time latin">08:42</span>
+            <a class="latest__link" href="#"><span class="cat">ފަތުރުވެރިކަން</span>ބ. އަތޮޅުގައި އައު ގެސްޓްހައުސްއެއް ހުޅުވައި، އެނދުގެ އަދަދު އިތުރުވެއްޖެ</a>
+          </li>
+          <li>
+            <span class="latest__time latin">08:15</span>
+            <a class="latest__link" href="#"><span class="cat">ކުޅިވަރު</span>އަތޮޅު ފުޓްބޯޅަ މުބާރާތުގެ ފައިނަލަށް ކެންދޫ ދަތުރުކޮށްފި</a>
+          </li>
+          <li>
+            <span class="latest__time latin">07:50</span>
+            <a class="latest__link" href="#"><span class="cat">ވިޔަފާރި</span>ދިވެހި ރުފިޔާގެ އަގު ހަމަހަމަކުރުމަށް އައު ފިޔަވަޅުތަކެއް</a>
+          </li>
+          <li>
+            <span class="latest__time latin">07:20</span>
+            <a class="latest__link" href="#"><span class="cat">ދުނިޔެ</span>މޫސުމަށް އަންނަ ބަދަލުތަކާ ބެހޭ ބައިނަލްއަޤްވާމީ ސަމިޓް ފެށިއްޖެ</a>
+          </li>
+          <li>
+            <span class="latest__time latin">06:55</span>
+            <a class="latest__link" href="#"><span class="cat">ރާއްޖެ</span>ސްކޫލް ބަންދާ ދިމާކޮށް ފެރީގެ ޝެޑިއުލަށް ބަދަލު ގެނެސްފި</a>
+          </li>
+          <li>
+            <span class="latest__time latin">06:30</span>
+            <a class="latest__link" href="#"><span class="cat">މުނިފޫހިފިލުވުން</span>ފިލްމީ ދާއިރާއަށް އައު ފަންނާނުންތަކެއް ތަޢާރަފުވެއްޖެ</a>
+          </li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ---------- CATEGORY BLOCK: ރާއްޖެ ---------- -->
+    <section aria-label="ރާއްޖެ">
+      <div class="sec-head">
+        <h2>ރާއްޖެ</h2>
+        <a class="more" href="#">އިތުރަށް ›</a>
+      </div>
+      <div class="cards-4">
+        <!-- 4 article cards -->
+        <a class="card" href="#">
+          <div class="card__thumb"><img src="https://picsum.photos/seed/dv1/600/400" alt=""><span class="tag">ރާއްޖެ</span></div>
+          <div class="card__body">
+            <h3 class="card__title">ކެންދޫ ސްކޫލްގެ ދަރިވަރުންނަށް ބައިނަލްއަޤްވާމީ ފެންވަރުގެ ކާމިޔާބީއެއް</h3>
+            <div class="meta"><span>4 އޯގަސްޓް 2026</span></div>
+          </div>
+        </a>
+        <a class="card" href="#">
+          <div class="card__thumb"><img src="https://picsum.photos/seed/dv2/600/400" alt=""><span class="tag">ރާއްޖެ</span></div>
+          <div class="card__body">
+            <h3 class="card__title">އަތޮޅު ހޮސްޕިޓަލަށް އައު ޑޮކްޓަރުންނާއި ސިއްޙީ ޚިދުމަތްތެރިން ފޮނުވަނީ</h3>
+            <div class="meta"><span>3 އޯގަސްޓް 2026</span></div>
+          </div>
+        </a>
+        <a class="card" href="#">
+          <div class="card__thumb"><img src="https://picsum.photos/seed/dv3/600/400" alt=""><span class="tag">ރާއްޖެ</span></div>
+          <div class="card__body">
+            <h3 class="card__title">ފެނާއި ނަރުދަމާގެ ނިޒާމު ޤާއިމުކުރުމުގެ މަސައްކަތް ނިމުމަކާ ގާތަށް</h3>
+            <div class="meta"><span>3 އޯގަސްޓް 2026</span></div>
+          </div>
+        </a>
+        <a class="card" href="#">
+          <div class="card__thumb"><img src="https://picsum.photos/seed/dv4/600/400" alt=""><span class="tag">ރާއްޖެ</span></div>
+          <div class="card__body">
+            <h3 class="card__title">ރަށު ކައުންސިލުން ޒުވާނުންނަށް ޚާއްޞަ ތަމްރީނު ޕްރޮގްރާމެއް ފަށައިފި</h3>
+            <div class="meta"><span>2 އޯގަސްޓް 2026</span></div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- In-content leaderboard ad -->
+    <div class="ad ad--incontent">
+      <div><span class="adtag latin">ADVERTISEMENT</span><small>970 × 90 — In-content Leaderboard</small></div>
+    </div>
+
+    <!-- ---------- CONTENT + SIDEBAR (Tourism + Sports with 300x600 ad) ---------- -->
+    <div class="content-grid">
+      <div class="content-main">
+
+        <!-- CATEGORY BLOCK: ފަތުރުވެރިކަން -->
+        <section aria-label="ފަތުރުވެރިކަން">
+          <div class="sec-head">
+            <h2>ފަތުރުވެރިކަން</h2>
+            <a class="more" href="#">އިތުރަށް ›</a>
+          </div>
+          <div class="cards-4">
+            <a class="card" href="#">
+              <div class="card__thumb"><img src="https://picsum.photos/seed/tour1/600/400" alt=""><span class="tag">ރިސޯޓު</span></div>
+              <div class="card__body">
+                <h3 class="card__title">ބ. އަތޮޅުގައި އައު ރިސޯޓެއް ތަރައްޤީކުރުމަށް ބިޑް ހުޅުވާލައިފި</h3>
+                <div class="meta"><span>4 އޯގަސްޓް 2026</span></div>
+              </div>
+            </a>
+            <a class="card" href="#">
+              <div class="card__thumb"><img src="https://picsum.photos/seed/tour2/600/400" alt=""><span class="tag">ގެސްޓްހައުސް</span></div>
+              <div class="card__body">
+                <h3 class="card__title">ލޯކަލް ޓޫރިޒަމް ފުޅާވެ، ގެސްޓްހައުސްތަކުގެ ބުކިންގ އިތުރުވެއްޖެ</h3>
+                <div class="meta"><span>3 އޯގަސްޓް 2026</span></div>
+              </div>
+            </a>
+            <a class="card" href="#">
+              <div class="card__thumb"><img src="https://picsum.photos/seed/tour3/600/400" alt=""><span class="tag">ލޯކަލް ޓޫރިޒަމް</span></div>
+              <div class="card__body">
+                <h3 class="card__title">ފީނުމުގެ ދާއިރާ ކުރިއެރުވުމަށް އައު ޑައިވް ސެންޓަރެއް ހުޅުވައިފި</h3>
+                <div class="meta"><span>2 އޯގަސްޓް 2026</span></div>
+              </div>
+            </a>
+            <a class="card" href="#">
+              <div class="card__thumb"><img src="https://picsum.photos/seed/tour4/600/400" alt=""><span class="tag">ފަތުރުވެރިކަން</span></div>
+              <div class="card__body">
+                <h3 class="card__title">ފަތުރުވެރިކަމުގެ ދާއިރާއިން ޒުވާނުން ބިނާކުރުމަށް ކޯސްތަކެއް</h3>
+                <div class="meta"><span>1 އޯގަސްޓް 2026</span></div>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- CATEGORY BLOCK: ކުޅިވަރު -->
+        <section aria-label="ކުޅިވަރު">
+          <div class="sec-head">
+            <h2>ކުޅިވަރު</h2>
+            <a class="more" href="#">އިތުރަށް ›</a>
+          </div>
+          <div class="cards-4">
+            <a class="card" href="#">
+              <div class="card__thumb"><img src="https://picsum.photos/seed/sport1/600/400" alt=""><span class="tag">ކުޅިވަރު</span></div>
+              <div class="card__body">
+                <h3 class="card__title">އަތޮޅު ފުޓްބޯޅަ މުބާރާތުގެ ފައިނަލަށް ކެންދޫ ދަތުރުކޮށްފި</h3>
+                <div class="meta"><span>4 އޯގަސްޓް 2026</span></div>
+              </div>
+            </a>
+            <a class="card" href="#">
+              <div class="card__thumb"><img src="https://picsum.photos/seed/sport2/600/400" alt=""><span class="tag">ކުޅިވަރު</span></div>
+              <div class="card__body">
+                <h3 class="card__title">ޤައުމީ ވޮލީ ޓީމް ބައިނަލްއަޤްވާމީ މުބާރާތަށް ފުރައިފި</h3>
+                <div class="meta"><span>3 އޯގަސްޓް 2026</span></div>
+              </div>
+            </a>
+            <a class="card" href="#">
+              <div class="card__thumb"><img src="https://picsum.photos/seed/sport3/600/400" alt=""><span class="tag">ކުޅިވަރު</span></div>
+              <div class="card__body">
+                <h3 class="card__title">ޒުވާނުންގެ ދުވަހާ ގުޅިގެން ބާއްވާ ދުވުމުގެ ރޭހަށް ހުޅުވާލައިފި</h3>
+                <div class="meta"><span>2 އޯގަސްޓް 2026</span></div>
+              </div>
+            </a>
+            <a class="card" href="#">
+              <div class="card__thumb"><img src="https://picsum.photos/seed/sport4/600/400" alt=""><span class="tag">ކުޅިވަރު</span></div>
+              <div class="card__body">
+                <h3 class="card__title">ބަށިބޯޅަ މުބާރާތުގެ ޗެމްޕިއަންކަން އަންހެން ޓީމުން ހޯދައިފި</h3>
+                <div class="meta"><span>1 އޯގަސްޓް 2026</span></div>
+              </div>
+            </a>
+          </div>
+        </section>
+
+      </div><!-- /content-main -->
+
+      <!-- Sidebar: most-read widget + 300x600 ad -->
+      <aside class="sidebar" aria-label="ސައިޑްބާ">
+        <div class="widget">
+          <div class="widget__head">އެންމެ ގިނަ ބޭފުޅުން ކީ</div>
+          <ul class="rank-list">
+            <li><span class="num latin">1</span><a href="#">ކެންދޫ ބަނދަރު ތަރައްޤީގެ މަޝްރޫޢު އަންނަ މަހު ފެށޭނެ</a></li>
+            <li><span class="num latin">2</span><a href="#">ބ. އަތޮޅުގައި އައު ރިސޯޓެއް ތަރައްޤީކުރަނީ</a></li>
+            <li><span class="num latin">3</span><a href="#">އަތޮޅު ފުޓްބޯޅަ މުބާރާތުގެ ފައިނަލަށް ކެންދޫ</a></li>
+            <li><span class="num latin">4</span><a href="#">ދިވެހި ރުފިޔާގެ އަގު ހަމަހަމަކުރުމަށް ފިޔަވަޅުތަކެއް</a></li>
+            <li><span class="num latin">5</span><a href="#">ފެނާއި ނަރުދަމާގެ މަސައްކަތް ނިމުމަކާ ގާތަށް</a></li>
+          </ul>
+        </div>
+
+        <!-- 300 x 600 sidebar ad -->
+        <div class="ad ad--rect">
+          <div><span class="adtag latin">ADVERTISEMENT</span><small>300 × 600 — Half Page</small></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ---------- PHOTO GALLERY STRIP ---------- -->
+    <section aria-label="ފޮޓޯ ގެލެރީ">
+      <div class="sec-head">
+        <h2>ފޮޓޯ ގެލެރީ</h2>
+        <a class="more" href="#">ހުރިހާ ފޮޓޯ ›</a>
+      </div>
+      <div class="gallery">
+        <a class="gtile" href="#">
+          <img src="https://picsum.photos/seed/gal1/600/450" alt="">
+          <span class="gtile__icon">📷 24</span>
+          <span class="gtile__cap">ކެންދޫ ބަނދަރު ސަރަޙައްދު — ފޮޓޯ ސްޓޯރީ</span>
+        </a>
+        <a class="gtile" href="#">
+          <img src="https://picsum.photos/seed/gal2/600/450" alt="">
+          <span class="gtile__icon">📷 18</span>
+          <span class="gtile__cap">ފުޓްބޯޅަ ފައިނަލްގެ ފޯރިގަދަ ވަގުތުކޮޅު</span>
+        </a>
+        <a class="gtile" href="#">
+          <img src="https://picsum.photos/seed/gal3/600/450" alt="">
+          <span class="gtile__icon">📷 32</span>
+          <span class="gtile__cap">ސްކޫލް އަހަރީ ދުވަހުގެ ޙަރަކާތްތައް</span>
+        </a>
+        <a class="gtile" href="#">
+          <img src="https://picsum.photos/seed/gal4/600/450" alt="">
+          <span class="gtile__icon">📷 15</span>
+          <span class="gtile__cap">އަތޮޅުގެ ރީތި ފަޅުތަކާއި ފަރުތައް</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ---------- ON THIS DAY / ARCHIVE ---------- -->
+    <section aria-label="ތާރީޚުގެ ތެރެއިން މިއަދު">
+      <div class="sec-head">
+        <h2>ތާރީޚުގެ ތެރެއިން މިއަދު</h2>
+        <a class="more" href="#">އާކައިވް ›</a>
+      </div>
+      <div class="archive">
+        <div class="archive__grid">
+          <div class="yearcol">
+            <div class="yearcol__badge latin">2024</div>
+            <div class="yearcol__label">މީގެ 2 އަހަރު ކުރިން</div>
+            <ul>
+              <li>ކެންދޫ ސްކޫލްގެ އައު އިމާރާތުގެ ބިންގާ އެޅުން</li>
+              <li>އަތޮޅު ކައުންސިލްގެ އިންތިޚާބުގެ ނަތީޖާ އިޢުލާނުކުރުން</li>
+            </ul>
+          </div>
+          <div class="yearcol">
+            <div class="yearcol__badge latin">2021</div>
+            <div class="yearcol__label">މީގެ 5 އަހަރު ކުރިން</div>
+            <ul>
+              <li>ރަށުގެ ފެނުގެ ނިޒާމުގެ ޚިދުމަތް ފެށުން</li>
+              <li>ފުރަތަމަ ފަހަރަށް ބައިނަލްއަޤްވާމީ ފެސްޓިވަލެއް ބޭއްވުން</li>
+            </ul>
+          </div>
+          <div class="yearcol">
+            <div class="yearcol__badge latin">2018</div>
+            <div class="yearcol__label">މީގެ 8 އަހަރު ކުރިން</div>
+            <ul>
+              <li>ކެންދޫ.ކޮމް ފުރަތަމަ ފަހަރަށް އޮންލައިންވުން</li>
+              <li>ރަށުގެ ފުޓްބޯޅަ ދަނޑު ރަސްމީކޮށް ހުޅުވުން</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================== FOOTER ====================== -->
+  <footer class="footer">
+    <div class="wrap footer__top">
+      <!-- About -->
+      <div class="footer__brand">
+        <span class="brand__mark">ކެން<span style="color:var(--red)">ދޫ</span><span class="brand__tld">.com</span></span>
+        <p>ބ. ކެންދޫއާއި ރާއްޖެއާއި ދުނިޔޭގެ އެންމެ ފަހުގެ ޚަބަރު، ތެދު މަޢުލޫމާތާއެކު، ހަލުވިކަމާއެކު ގެނެސްދިނުން.</p>
+        <div class="footer__social">
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 22v-8h2.7l.4-3H13V9c0-.9.3-1.5 1.6-1.5H16V4.8C15.6 4.7 14.6 4.6 13.5 4.6 11.2 4.6 9.7 6 9.7 8.6V11H7v3h2.7v8H13z"/></svg></a>
+          <a href="#" aria-label="X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.5 3H21l-7.3 8.3L22 21h-6.4l-5-6.1L4.8 21H1.3l7.8-8.9L2 3h6.6l4.5 5.6L17.5 3z"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23 12s0-3.2-.4-4.7a2.5 2.5 0 00-1.7-1.7C19.4 5.2 12 5.2 12 5.2s-7.4 0-8.9.4A2.5 2.5 0 001.4 7.3C1 8.8 1 12 1 12s0 3.2.4 4.7c.2.9.9 1.5 1.7 1.7 1.5.4 8.9.4 8.9.4s7.4 0 8.9-.4a2.5 2.5 0 001.7-1.7C23 15.2 23 12 23 12zm-13 3V9l5.2 3-5.2 3z"/></svg></a>
+        </div>
+      </div>
+
+      <!-- Extended navigation (replicated main menu) -->
+      <div class="footer__col">
+        <h4>ބައިތައް</h4>
+        <ul>
+          <li><a href="#">ރާއްޖެ</a></li>
+          <li><a href="#">ފަތުރުވެރިކަން</a></li>
+          <li><a href="#">ކުޅިވަރު</a></li>
+          <li><a href="#">ވިޔަފާރި</a></li>
+          <li><a href="#">ދުނިޔެ</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>އިތުރު</h4>
+        <ul>
+          <li><a href="#">މުނިފޫހިފިލުވުން</a></li>
+          <li><a href="#">ރިޕޯޓް</a></li>
+          <li><a href="#">ފޮޓޯ ގެލެރީ</a></li>
+          <li><a href="#">އެންމެފަސް</a></li>
+        </ul>
+      </div>
+
+      <!-- Policy / static pages -->
+      <div class="footer__col">
+        <h4>އަހަރެމެން</h4>
+        <ul>
+          <li><a href="#">ޤަވާޢިދު (Code of Conduct)</a></li>
+          <li><a href="#">ގުޅުއްވުމަށް (Contact Us)</a></li>
+          <li><a href="#">އެޑިޓޯރިއަލް ސިޔާސަތު</a></li>
+          <li><a href="#">އިޝްތިހާރު (Advertise)</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <span class="latin">Copyright © 2026 kendhoo.com</span> — ހުރިހާ ޙައްޤެއް ލިބިގެންވެއެވެ.
+    </div>
+  </footer>
+
+  <!-- ====================== JAVASCRIPT ====================== -->
+  <script>
+    (function () {
+      "use strict";
+
+      var root = document.documentElement;
+
+      /* ---- 1. Dark mode toggle (persists via localStorage where allowed) ---- */
+      var themeToggle = document.getElementById("themeToggle");
+
+      // restore saved preference (guarded: some sandboxes block storage)
+      try {
+        var saved = localStorage.getItem("kendhoo-theme");
+        if (saved) root.setAttribute("data-theme", saved);
+      } catch (e) { /* storage unavailable — ignore, defaults to light */ }
+
+      themeToggle.addEventListener("click", function () {
+        var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        root.setAttribute("data-theme", next);
+        try { localStorage.setItem("kendhoo-theme", next); } catch (e) {}
+      });
+
+      /* ---- 2. Mobile hamburger menu ---- */
+      var navToggle = document.getElementById("navToggle");
+      var menu = document.getElementById("menu");
+
+      navToggle.addEventListener("click", function () {
+        var open = menu.classList.toggle("show");
+        navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+
+      /* ---- 3. Dropdowns ----
+         Desktop: CSS :hover handles it.
+         Mobile/touch: tapping a parent with a dropdown toggles it. */
+      document.querySelectorAll(".has-dropdown > a").forEach(function (link) {
+        link.addEventListener("click", function (ev) {
+          // only intercept on the collapsed (mobile) layout
+          if (window.matchMedia("(max-width: 992px)").matches) {
+            ev.preventDefault();
+            link.parentElement.classList.toggle("open");
+          }
+        });
+      });
+
+      /* ---- 4. Live date in the top bar (Dhivehi weekday + month) ---- */
+      var days   = ["އާދީއްތަ","ހޯމަ","އަންގާރަ","ބުދަ","ބުރާސްފަތި","ހުކުރު","ހޮނިހިރު"];
+      var months = ["ޖަނަވަރީ","ފެބްރުއަރީ","މާރިޗު","އޭޕްރީލް","މޭ","ޖޫން","ޖުލައި","އޯގަސްޓް","ސެޕްޓެންބަރު","އޮކްޓޫބަރު","ނޮވެންބަރު","ޑިސެންބަރު"];
+      var now = new Date();
+      var el = document.getElementById("today");
+      if (el) {
+        el.textContent = days[now.getDay()] + "، " + now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear();
+      }
+
+      /* ---- 5. Search button (demo stub) ---- */
+      document.getElementById("searchBtn").addEventListener("click", function () {
+        var q = window.prompt("ހޯއްދަވަން ބޭނުންވާ ބަހެއް ލިޔުއްވާ:");
+        if (q) { /* wire to your real search endpoint here */ }
+      });
+    })();
+  </script>
+</body>
+</html>
