@@ -1,0 +1,57 @@
+# ============================================================
+#  Decap CMS configuration for kendhoo.com
+# ============================================================
+
+backend:
+  name: github
+  repo: Baloo333/kendhoo        # your GitHub username/repo
+  branch: main
+  # ▼▼▼  REPLACE this with your Cloudflare Worker URL (no trailing slash) ▼▼▼
+  base_url: https://kendhoo-cms-auth.aiman1997ahmed.workers.dev
+  # auth_endpoint defaults to /auth, which the Worker handles.
+
+# Where images uploaded through the editor are stored & served
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+site_url: https://kendhoo.com
+display_url: https://kendhoo.com
+
+# Editorial interface language hint (labels below are in Dhivehi anyway)
+locale: en
+
+collections:
+  - name: "news"
+    label: "ޚަބަރު"                 # "News"
+    label_singular: "ޚަބަރު"
+    folder: "_posts"
+    create: true
+    # Filename pattern -> 2026-08-10-my-slug.md  (matches the Jekyll _posts rule)
+    slug: "{{year}}-{{month}}-{{day}}-{{fields.slug}}"
+    extension: "md"
+    format: "yaml-frontmatter"
+    fields:
+      - { name: "layout", label: "Layout", widget: "hidden", default: "post" }
+      - { name: "title", label: "ސުރުޚީ (Headline)", widget: "string" }
+      - { name: "slug", label: "ސްލަގް — filename (English, e.g. kendhoo-bandaru)", widget: "string", pattern: ['^[a-z0-9-]+$', "lowercase English letters, numbers and hyphens only"] }
+      - name: "category"
+        label: "ބައި (Category)"
+        widget: "select"
+        options:
+          - "ރާއްޖެ"
+          - "ފަތުރުވެރިކަން"
+          - "ކުޅިވަރު"
+          - "ވިޔަފާރި"
+          - "ދުނިޔެ"
+          - "މުނިފޫހިފިލުވުން"
+          - "ރިޕޯޓް"
+      - name: "date"
+        label: "ތާރީޚު (Date)"
+        widget: "datetime"
+        date_format: "YYYY-MM-DD"
+        time_format: "HH:mm"
+        format: "YYYY-MM-DD HH:mm:ss +0500"
+      - { name: "image", label: "ފޮޓޯ (Cover image)", widget: "image", required: false }
+      - { name: "excerpt", label: "ޚުލާޞާ (Short summary)", widget: "text", required: false }
+      - { name: "featured", label: "ފީޗަރޑް — show as top story?", widget: "boolean", default: false }
+      - { name: "body", label: "ލިޔުން (Article body)", widget: "markdown" }
