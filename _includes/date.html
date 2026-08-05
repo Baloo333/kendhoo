@@ -1,0 +1,8 @@
+{%- comment -%}
+  Formats a date in Dhivehi, e.g. "4 އޯގަސްޓް 2026".
+  Usage:  {% include date.html date=page.date %}
+{%- endcomment -%}
+{%- assign _mn = include.date | date: "%-m" | plus: 0 -%}
+{%- assign _i = _mn | minus: 1 -%}
+{%- assign _months = "ޖަނަވަރީ,ފެބްރުއަރީ,މާރިޗު,އޭޕްރީލް,މޭ,ޖޫން,ޖުލައި,އޯގަސްޓް,ސެޕްޓެންބަރު,އޮކްޓޫބަރު,ނޮވެންބަރު,ޑިސެންބަރު" | split: "," -%}
+{{- include.date | date: "%-d" }} {{ _months[_i] }} {{ include.date | date: "%Y" -}}

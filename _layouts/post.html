@@ -1,0 +1,25 @@
+---
+layout: default
+---
+<!-- Single news article. Fields come from the article file's front matter. -->
+<main class="wrap">
+  <article class="post">
+    {% if page.category %}<div class="post__cat"><span class="tag">{{ page.category }}</span></div>{% endif %}
+
+    <h1 class="post__title">{{ page.title }}</h1>
+
+    <div class="meta">
+      <span>{% include date.html date=page.date %}</span>
+    </div>
+
+    {% if page.image %}
+      <img class="post__cover" src="{{ page.image }}" alt="{{ page.title }}" />
+    {% endif %}
+
+    <div class="post__body">
+      {{ content }}
+    </div>
+
+    <a class="post__back" href="/">‹ މައި ޞަފްޙާއަށް</a>
+  </article>
+</main>

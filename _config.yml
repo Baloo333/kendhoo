@@ -1,0 +1,30 @@
+# ============================================================
+#  Kendhoo.com — Jekyll configuration
+#  GitHub Pages reads this file and builds the site for free.
+# ============================================================
+
+title: "ކެންދޫ.ކޮމް"
+description: "ބ. ކެންދޫއާއި ރާއްޖެއާއި ދުނިޔޭގެ އެންމެ ފަހުގެ ޚަބަރު"
+lang: dv
+timezone: Indian/Maldives
+
+# Clean article URLs, e.g. /news/kendhoo-bandaru/
+permalink: /news/:title/
+
+# Don't turn these into web pages
+exclude:
+  - README.md
+  - .gitignore
+  - Gemfile
+  - Gemfile.lock
+
+# Category names used across the site (for reference/consistency).
+# These are the values you type in each article's "category" field.
+categories:
+  - ރާއްޖެ
+  - ފަތުރުވެރިކަން
+  - ކުޅިވަރު
+  - ވިޔަފާރި
+  - ދުނިޔެ
+  - މުނިފޫހިފިލުވުން
+  - ރިޕޯޓް

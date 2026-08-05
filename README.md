@@ -1,84 +1,123 @@
 # ކެންދޫ.ކޮމް — kendhoo.com
 
-A responsive, right-to-left (RTL) Dhivehi news website. Static site — pure
-HTML/CSS/JS, no build step, hosted free on **GitHub Pages**.
-
-## Files
-
-| File          | Purpose                                             |
-| ------------- | --------------------------------------------------- |
-| `index.html`  | The homepage (this is what GitHub Pages serves).    |
-| `404.html`    | Shown when a page isn't found.                      |
-| `CNAME`       | Tells GitHub Pages to serve at `kendhoo.com`.       |
-| `.gitignore`  | Keeps editor/OS junk out of the repo.               |
-| `README.md`   | This file.                                          |
-
-> **Don't want the custom domain yet?** Delete `CNAME` and the site will live at
-> `https://<your-username>.github.io/<repo-name>/` instead.
+A Dhivehi (RTL) news site built with **Jekyll**, hosted free on **GitHub Pages**.
+Each article is its own file. Add a file → it appears on the site automatically,
+in the hero, the latest list, and its category block.
 
 ---
 
-## Deploy — Option A: GitHub website (no tools to install)
+## Folder map
 
-1. Go to <https://github.com/new> and create a repository.
-   - Name it `kendhoo` (or anything). Keep it **Public**.
-2. On the new repo page, click **uploading an existing file**.
-3. Drag **all the files in this folder** (`index.html`, `404.html`, `CNAME`,
-   `.gitignore`, `README.md`) into the upload area, then **Commit changes**.
-4. Go to **Settings → Pages**.
-5. Under **Build and deployment → Source**, choose **Deploy from a branch**.
-   Set branch to **main** and folder to **/(root)**, then **Save**.
-6. Wait ~1 minute. Your site goes live. GitHub shows the URL at the top of the
-   Pages settings.
+```
+kendhoo/
+├── index.html          ← homepage (auto-built from articles; don't hand-edit content)
+├── _config.yml         ← site settings
+├── _layouts/           ← page templates (design lives here)
+│   ├── default.html    ←   header, nav, footer, all styles + scripts
+│   └── post.html       ←   the single-article page
+├── _includes/
+│   └── date.html       ←   Dhivehi date formatter
+├── _posts/             ← YOUR ARTICLES GO HERE ★
+│   └── 2026-08-04-kendhoo-bandaru.md   (+ more samples)
+├── 404.html
+├── CNAME               ← kendhoo.com
+└── .gitignore
+```
 
-## Deploy — Option B: Git command line
+You only ever touch **`_posts/`** to publish. Everything else is the machinery.
 
-Run these from inside this folder (replace `YOUR-USERNAME`):
+---
+
+## ★ How to publish a new article (on GitHub, no tools)
+
+1. Open your repo → click the **`_posts`** folder.
+2. Click **Add file → Create new file**.
+3. **Name it** using this exact pattern — date, then a short English slug, then `.md`:
+   ```
+   2026-08-10-kendhoo-council-meeting.md
+   ```
+   (The date controls ordering; the slug becomes the web address. Use only
+   lowercase letters, numbers and hyphens in the slug — no spaces, no Thaana.)
+4. **Paste this template** and fill it in:
+   ```
+   ---
+   layout: post
+   title: "ސުރުޚީ މިތާ ލިޔޭ"
+   category: "ރާއްޖެ"
+   date: 2026-08-10 09:00:00 +0500
+   image: "https://picsum.photos/seed/anything/1200/675"
+   excerpt: "ކުރު ޚުލާޞާއެއް މިތާ ލިޔޭ."
+   featured: false
+   ---
+
+   ފުރަތަމަ ޕެރެގްރާފް މިތާ ލިޔޭ.
+
+   ## ސެކްޝަން ސުރުޚީ
+
+   އިތުރު ލިޔުން މިތާ ލިޔޭ.
+   ```
+5. Scroll down, click **Commit new file**.
+
+That's it. Within ~1 minute GitHub rebuilds and the article is live at
+`kendhoo.com/news/kendhoo-council-meeting/`.
+
+### The fields explained
+| Field       | What it does                                                          |
+| ----------- | --------------------------------------------------------------------- |
+| `title`     | The headline (Thaana). Keep it inside the quotes.                     |
+| `category`  | Which block it shows in. Use one of the categories listed below.      |
+| `date`      | `YYYY-MM-DD HH:MM:SS +0500` — `+0500` is Maldives time. Newest first. |
+| `image`     | Cover image URL. Replace picsum links with your real photo URLs.      |
+| `excerpt`   | Short summary shown under the headline.                               |
+| `featured`  | Set **one** article to `true` to make it the big hero story. Rest `false`. |
+
+**Categories** (type one, exactly): `ރާއްޖެ`, `ފަތުރުވެރިކަން`, `ކުޅިވަރު`,
+`ވިޔަފާރި`, `ދުނިޔެ`, `މުނިފޫހިފިލުވުން`, `ރިޕޯޓް`.
+
+### Editing or deleting
+- **Edit:** open the file in `_posts/`, click the ✏️ pencil, change, commit.
+- **Delete:** open the file, click the 🗑️ trash icon, commit.
+
+---
+
+## Putting this on your repo the first time
+
+Your repo currently has the old single-file version. Replace it with this
+structure. Easiest is the command line from inside this folder:
 
 ```bash
-git init
+git clone https://github.com/Baloo333/kendhoo.git
+# copy all these files into that folder (including _posts, _layouts, _includes)
+cd kendhoo
 git add .
-git commit -m "Launch kendhoo.com"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/kendhoo.git
-git push -u origin main
+git commit -m "Convert site to Jekyll with article files"
+git push
 ```
 
-Then do steps 4–6 from Option A to switch Pages on.
+Or via the website: repo → **Add file → Upload files**, then drag in the
+top-level items **including the `_posts`, `_layouts`, and `_includes` folders**
+(GitHub keeps the folder structure). Commit. It overwrites the old `index.html`
+and adds the rest.
+
+> After pushing, check the **Actions** tab. A green check = built and live.
+> A red X = a typo in an article's front matter (usually a missing quote).
 
 ---
 
-## Custom domain: kendhoo.com
+## Later: add the form editor (Decap CMS)
 
-Because a `CNAME` file is included, GitHub Pages will want to serve the site at
-`kendhoo.com`. To make that work, add these records at your **domain
-registrar's DNS** settings:
-
-**Apex domain (kendhoo.com)** — four `A` records pointing to GitHub:
-
-```
-A   @   185.199.108.153
-A   @   185.199.109.153
-A   @   185.199.110.153
-A   @   185.199.111.153
-```
-
-**www subdomain (optional but recommended):**
-
-```
-CNAME   www   YOUR-USERNAME.github.io
-```
-
-Then in **Settings → Pages → Custom domain**, enter `kendhoo.com`, save, and
-tick **Enforce HTTPS** once the certificate is issued (can take up to an hour).
-
-DNS changes can take anywhere from a few minutes to 24 hours to take effect.
+When you want to stop editing files by hand, Decap CMS adds an admin page at
+`kendhoo.com/admin` with a proper form (title, category, image upload, body).
+It reads and writes these **same `_posts` files**, so nothing here changes —
+it just sits on top. It needs a one-time login setup via a small Cloudflare
+Worker (you already use Cloudflare). Ask when you're ready and it can be wired in.
 
 ---
 
-## Editing later
+## Local preview (optional)
 
-Everything is inside `index.html` — the CSS is in the `<style>` block and the
-JS in the `<script>` block at the bottom. Replace the `picsum.photos` image
-URLs with your own photos and swap the placeholder Dhivehi headlines with real
-articles. Commit and push again (or re-upload) and Pages updates automatically.
+```bash
+gem install jekyll bundler
+jekyll serve
+# open http://localhost:4000
+```
