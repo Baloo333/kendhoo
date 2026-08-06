@@ -1,0 +1,23 @@
+---
+layout: default
+title: "ވިޔަފާރި"
+permalink: /category/business/
+---
+<main class="wrap">
+  <section aria-label="ވިޔަފާރި">
+    <div class="sec-head"><h2>ވިޔަފާރި</h2></div>
+    {%- assign catposts = site.posts | where: "category", "ވިޔަފާރި" -%}
+    {% if catposts.size > 0 %}
+    <div class="cards-4">
+      {% for post in catposts %}
+      <a class="card" href="{{ post.url }}">
+        <div class="card__thumb"><img src="{{ post.image }}" alt="{{ post.title }}"><span class="tag">{{ post.category }}</span></div>
+        <div class="card__body"><h3 class="card__title">{{ post.title }}</h3><div class="meta"><span>{% include date.html date=post.date %}</span></div></div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p>މި ބައިގައި އަދި ޚަބަރެއް ނެތެވެ.</p>
+    {% endif %}
+  </section>
+</main>
