@@ -8,7 +8,14 @@
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | truncate: 150 }}{% else %}{{ site.description }}{% endif %}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thaana:wght@100..900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+  @font-face {
+    font-family: 'Faruma';
+    src: url('/faruma.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+  }
+</style>
 {% raw %}
   <style>
     /* ======================================================================
