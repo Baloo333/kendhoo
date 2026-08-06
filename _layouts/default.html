@@ -6,25 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% if page.title %}{{ page.title }} — {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | truncate: 150 }}{% else %}{{ site.description }}{% endif %}" />
-
-  <!-- Icons & PWA -->
-  <link rel="icon" href="/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <meta name="theme-color" content="#541c14" />
-
-  <!-- Open Graph / social sharing -->
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="{{ site.title }}" />
-  <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}" />
-  <meta property="og:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | truncate: 150 }}{% else %}{{ site.description }}{% endif %}" />
-  <meta property="og:url" content="https://kendhoo.com{{ page.url }}" />
-  <meta property="og:image" content="{% if page.image %}{{ page.image }}{% else %}https://kendhoo.com/og-image.png{% endif %}" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}" />
-  <meta name="twitter:image" content="{% if page.image %}{{ page.image }}{% else %}https://kendhoo.com/og-image.png{% endif %}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <style>
@@ -41,17 +22,17 @@
        1. DESIGN TOKENS
        ====================================================================== */
     :root {
-      --red:        #C8102E;   /* primary accent (masthead / tags / links) */
-      --red-dark:   #a10c24;
-      --ink:        #15181f;   /* near-black nav bar */
-      --ink-2:      #1f232c;
+      --red:        #541c14;   /* primary accent — brand maroon */
+      --red-dark:   #3f140d;
+      --ink:        #541c14;   /* maroon chrome: topbar / nav / footer */
+      --ink-2:      #431009;
 
-      --bg:         #ffffff;   /* page background */
-      --soft:       #f4f5f7;   /* soft section background */
-      --surface:    #ffffff;   /* cards */
-      --text:       #171a1f;   /* body text */
-      --muted:      #6b7280;   /* secondary text / dates */
-      --line:       #e7e8ec;   /* hairlines & borders */
+      --bg:         #f7f1e6;   /* beige-white page background */
+      --soft:       #efe6d5;   /* soft beige section background */
+      --surface:    #fffdf8;   /* warm off-white cards */
+      --text:       #2a1a13;   /* warm dark-brown body text */
+      --muted:      #8a7a6c;   /* warm muted text / dates */
+      --line:       #e6dac6;   /* warm beige hairlines */
 
       --radius:     8px;
       --shadow:     0 1px 2px rgba(20,24,31,.06), 0 6px 22px rgba(20,24,31,.05);
@@ -437,6 +418,33 @@
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; scroll-behavior: auto !important; transition: none !important; }
     }
+
+    /* ======================================================================
+       MAROON + BEIGE THEME — chrome accents & logo image
+       ====================================================================== */
+    .brand { align-items: center; }
+    .brand__logo { height: 46px; width: auto; display: block; }
+    .brand__logo--light { display: none; }
+    :root[data-theme="dark"] .brand__logo--dark { display: none; }
+    :root[data-theme="dark"] .brand__logo--light { display: block; }
+
+    /* topbar (on maroon) */
+    .topbar { color: #ecdcc6; }
+    .topbar__social a { color: #ecdcc6; }
+    .topbar__social a:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .topbar__date .dot { color: #e9c9a3; }
+
+    /* nav underline visible on maroon */
+    .nav .menu > li > a::after { background: #e9c9a3; }
+
+    /* footer (on maroon) */
+    .footer { color: #e8dccb; }
+    .footer__brand p { color: #d8c7ad; }
+    .footer__col h4 { color: #ffffff; }
+    .footer__col a { color: #e8dccb; }
+    .footer__col a:hover { color: #f2e6d2; }
+    .footer__brand .brand__logo { height: 42px; }
+    .footer__social a:hover { background: #f2e6d2; color: var(--ink); }
   </style>
 {% endraw %}
 {% raw %}
@@ -481,7 +489,8 @@
   <header class="masthead">
     <div class="wrap">
       <a class="brand" href="/" aria-label="ކެންދޫ.ކޮމް">
-        <span class="brand__mark">ކެން<span class="accent">ދޫ</span><span class="brand__tld">.com</span></span>
+        <img class="brand__logo brand__logo--dark" src="/logo.png" alt="ކެންދޫ.com" />
+        <img class="brand__logo brand__logo--light" src="/logo-white.png" alt="ކެންދޫ.com" />
         <span class="brand__tag">ބ. ކެންދޫގެ ޚަބަރު</span>
       </a>
       <div class="tools">
@@ -526,7 +535,7 @@
   <footer class="footer">
     <div class="wrap footer__top">
       <div class="footer__brand">
-        <span class="brand__mark">ކެން<span style="color:var(--red)">ދޫ</span><span class="brand__tld">.com</span></span>
+        <img class="brand__logo" src="/logo-white.png" alt="ކެންދޫ.com" />
         <p>ބ. ކެންދޫއާއި ރާއްޖެއާއި ދުނިޔޭގެ އެންމެ ފަހުގެ ޚަބަރު، ތެދު މަޢުލޫމާތާއެކު، ހަލުވިކަމާއެކު ގެނެސްދިނުން.</p>
       </div>
       <div class="footer__col">
