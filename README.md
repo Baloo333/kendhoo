@@ -121,3 +121,5 @@ gem install jekyll bundler
 jekyll serve
 # open http://localhost:4000
 ```
+
+<!-- rebuild trigger 2026-08-06 19:19:38Z -->
