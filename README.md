@@ -123,3 +123,4 @@ jekyll serve
 ```
 
 <!-- rebuild trigger 2026-08-06 19:19:38Z -->
+<!-- redeploy 03:29:50Z -->
